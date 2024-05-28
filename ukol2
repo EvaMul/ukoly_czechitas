@@ -1,20 +1,44 @@
+import sys
 import requests
 import json
 
-adresa = "https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=10"
+# Pekne reseni!
+# Chvalim:
+#   - strucnost a citelnost
+#   - strukturu: oddeleni jednotlivych kroku (1. ziskani dat, 2. transformace dat a 3. zapis dat)
+#   - pruchod seznamem dat jen jednou
+# Par nametu:
+#   - Soubor by urcite mel mit priponu .py.
+#   - Ktere (dalsi) hodnoty v kodu by bylo vhodne definovat jako konstanty?
+#   - Ocislovani by se dalo elegantne vyresit pomoci enumerate() (take viz parametr `start`).
+#   - Pro jednotlive kroky (ne nutne vsechny) by se nabizelo pouziti funkci.
+
+# Toto by bylo lepsi jako konstanta (idealne bez parametru).
+ADRESA = "https://cat-fact.herokuapp.com/facts/random"
+
 try:
-    response = requests.get(adresa, timeout=0.001)
+    # Parametry dotazu na stejne API se mohou v ramci delsiho programu menit, proto tady jako promenna.
+    req_params = {
+        'animal_type': 'cat',
+        'amount': 10,
+    }
+    response = requests.get(ADRESA, params=req_params, timeout=5)
 except requests.exceptions.Timeout:
-    print("jsi příliš nedočkavý")
-    response = requests.get(adresa)
+    print("Jsi příliš nedočkavý")
+    # response = requests.get(ADRESA)
+    # Kdybychom tu nemeli tu zadanim vynucenou vyjimku a druhy pokus o ziskani dat,
+    # v tomto bloku bychom chteli program ukoncit.
+    sys.exit(1)
+
 fakta_o_kockach = response.json()
 seznam_faktu = []
-for i in range (0, 10):
+for i in range(0, 10):
     fakt_orig = fakta_o_kockach[i]["text"]
-    fakt = f"{i}.{fakt_orig}"
+    # Vysledne ocislovani chceme od 1.
+    fakt = f"{i+1}. {fakt_orig}"
     seznam_faktu.append(fakt)
 print(seznam_faktu)
 
 
-with open("fakta.json", mode = 'w', encoding="utf-8") as output_file:
+with open("kocici_fakta.json", mode='w', encoding="utf-8") as output_file:
       json.dump(seznam_faktu, output_file, indent=4)  
