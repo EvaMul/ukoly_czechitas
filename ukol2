@@ -3,17 +3,18 @@ import json
 
 adresa = "https://cat-fact.herokuapp.com/facts/random?animal_type=cat&amount=10"
 try:
-        response = requests.get(adresa, timeout=0.001)
-        fakta_o_kockach = response.json()
-        #print(fakta_o_kockach[2]["text"])
-        seznam_faktu = []
-        for i in range (0, 10):
-            fakt_orig = fakta_o_kockach[i]["text"]
-            fakt = f"{i}.{fakt_orig}"
-            seznam_faktu.append(fakt)
-        print(seznam_faktu)
-except OSError:
-    raise RuntimeError("jsi příliš nedočkavý")
+    response = requests.get(adresa, timeout=0.001)
+except requests.exceptions.Timeout:
+    print("jsi příliš nedočkavý")
+    response = requests.get(adresa)
+fakta_o_kockach = response.json()
+seznam_faktu = []
+for i in range (0, 10):
+    fakt_orig = fakta_o_kockach[i]["text"]
+    fakt = f"{i}.{fakt_orig}"
+    seznam_faktu.append(fakt)
+print(seznam_faktu)
+
 
 with open("fakta.json", mode = 'w', encoding="utf-8") as output_file:
-      json.dump(seznam_faktu, output_file, indent=4)    
+      json.dump(seznam_faktu, output_file, indent=4)  
